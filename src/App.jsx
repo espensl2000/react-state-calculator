@@ -7,18 +7,18 @@ function App() {
   let operatorOptions = ['+', '-', '*', '/']
 
   const [values, setValues] = useState({
-    firstNumber: null,
+    firstNumber: '0',
     operator: '+',
-    secondNumber: null,
+    secondNumber: '0',
     result: 0,
   })
   
-  const [stored, setStored] = useState(null)
-
+  const [stored, setStored] = useState('0')
+  
   function clear(e){
     setValues(prev => ({
       ...prev,
-      [e]: null
+      [e]: '0'
     }))
   }
 
@@ -32,23 +32,35 @@ function App() {
     }))
   }
 
-  function handleInput(event){
-    setValues(prev => ({
-      ...prev,
-      [event.target.name]: (event.target.name === 'operator' || prev[event.target.value] === '0' ) ? event.target.value : 
-      (event.target.value === 'ANS' ) ? stored :
-      (
-      (prev[event.target.name] === null || prev[event.target.name] === '0' ) ? event.target.value :
+  function handleInput(event) {
+    const { name, value } = event.target;
+  
+    setValues(prev => {
+      const currentValue = prev[name];
+      if (value === 'ANS') {
+        return { ...prev, [name]: stored };
+      }
+      if(currentValue.length === 1 && currentValue.charAt(0) === '0' ){
+        console.log("hit")
+        return {...prev, [name]: value}
+      }
       
-      `${prev[event.target.name] + event.target.value}`
-      )
-    }))
+      if (name === 'operator') {
+        return { ...prev, [name]: value };
+      }
+  
+      if (value === '.' && currentValue.toString().includes('.')) {
+        return prev; 
+      }
+      const newValue = currentValue === null || currentValue === '0' ? value : `${currentValue}${value}`;
+      return { ...prev, [name]: newValue };
+    });
   }
 
   return (
     <div className="calculator">
       <div className="panel">
-        <p>{values.firstNumber ? values.firstNumber : 0}</p>
+        <p>{values.firstNumber}</p>
         <div className="numbers">
           {numberOptions.map((n) => (
             <>
@@ -72,7 +84,7 @@ function App() {
       </div>
 
       <div className="panel">
-        <p>{values.secondNumber ? values.secondNumber : 0}</p>
+        <p>{values.secondNumber}</p>
         <div className="numbers">
           {numberOptions.map((n) => (
             <>
